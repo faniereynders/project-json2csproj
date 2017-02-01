@@ -9,66 +9,15 @@
   "copyright": "Nugetizer 3000",
   "userSecretsId": "xyz123",
   "buildOptions": {
-    "emitEntryPoint": true,
-    "keyFile": "MyKey.snk",
-    "warningsAsErrors": true,
-    "nowarn": [ "CS0168", "CS0219" ],
-    "xmlDoc": true,
-    "preserveCompilationContext": true,
-    "outputName": "Different.AssemblyName",
-    "debugType": "portable",
-    "allowUnsafe": true,
-    "define": [ "TEST", "OTHERCONDITION" ]
-  },
-  "packOptions": {
-    "summary": "A bundle of cats",
-    "tags": [ "hyperscale", "cats" ],
-    "owners": [ "Nate", "Jenna" ],
-    "releaseNotes": "Version 1.0",
-    "iconUrl": "https://icons.com/awesomeness.png",
-    "projectUrl": "https://github.com/natemcmaster",
-    "licenseUrl": "https://www.apache.org/licenses/LICENSE-2.0",
-    "requireLicenseAcceptance": false,
-    "repository": {
-      "type": "git",
-      "url": "https://github.com/natemcmaster/natemcmaster.github.io"
-    }
-  },
-  "scripts": {
-    "precompile": "generateCode.cmd",
-    "postpublish": [ "obfuscate.cmd", "removeTempFiles.cmd" ]
+    "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.Bcl.Immutable": "1.1.18-beta-*",
-    "Microsoft.AspNet.ConfigurationModel": "0.1-alpha-*",
-    "AnotherProject": {
-      "type": "project"
-    },
-    "Microsoft.EntityFrameworkCore.Design": {
-      "version": "1.1.0",
-      "type": "build"
-    }
+    "Stubbr": "*"
 
   },
   "frameworks": {
     "netcoreapp1.0": {
-      "dependencies": {
-        "Newtonsoft.Json": "9.0.1"
-      }
-    },
-    "net451": {
-      "dependencies": {
-        "System.Collections.Immutable": "1.3.1"
-      }
+
     }
-  },
-  "runtimes": {
-    "win7-x64": {},
-    "osx.10.11-x64": {},
-    "ubuntu.16.04-x64": {}
-  },
-  "tools": {
-    "Microsoft.EntityFrameworkCore.Tools.DotNet": "1.0.0-*",
-    "Microsoft.EntityFrameworkCore.Tools.DotNet2": "1.0.0-*"
   }
 }

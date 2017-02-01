@@ -23,7 +23,7 @@ namespace JsonCsProj.Poc
 
         [XmlElement("PropertyGroup")]
         public List<PropertyGroup> PropertyGroups { get; set; }
-        [XmlElement("Itemgroup")]
+        [XmlElement("ItemGroup")]
         public List<ItemGroup> ItemGroups { get; set; }
         [XmlElement("Target")]
         public List<Target> Targets { get; set; }
@@ -144,7 +144,7 @@ namespace JsonCsProj.Poc
         public string Description { get; set; }
         public string Copyright { get; set; }
         public string UserSecretsId { get; set; }
-        public string TargetFrameworks { get; set; }
+        public string TargetFramework { get; set; }
         public string PackageTargetFallback { get; set; }
         public string RuntimeIdentifiers { get; set; }
         public string OutputType { get; set; }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace JsonCsProj.Poc
@@ -23,7 +24,7 @@ namespace JsonCsProj.Poc
             var destination = new CsProj();
 
             destination.Sdk = "Microsoft.NET.Sdk";
-            destination.ToolsVersion = "15.0";
+           
             destination.PropertyGroups.Add(new PropertyGroup { Version = source.Version.Replace("-*","") });
             destination.PropertyGroups.Add(new PropertyGroup {
                 Authors = string.Join(";", source.Authors),
@@ -36,7 +37,7 @@ namespace JsonCsProj.Poc
             });
             destination.PropertyGroups.Add(new PropertyGroup
             {
-                TargetFrameworks = string.Join(";", source.Frameworks.Select(f=>f.Key).ToArray())
+                TargetFramework = string.Join(";", source.Frameworks.Select(f=>f.Key).ToArray())
             });
 
            
@@ -49,14 +50,22 @@ namespace JsonCsProj.Poc
             foreach (var framework in source.Frameworks)
             {
                 var depGroup = parseDependencies(framework.Value.Dependencies);
+                if (depGroup == null)
+                {
+                    continue;
+                }
                 depGroup.Condition = $"'$(TargetFramework)'=='{framework.Key}'";
                 destination.ItemGroups.Add(depGroup);
             }
 
-            destination.PropertyGroups.Add(new PropertyGroup
+            if (source.Runtimes != null)
             {
-                RuntimeIdentifiers = string.Join(";", source.Runtimes.Keys.ToArray())
-            });
+                destination.PropertyGroups.Add(new PropertyGroup
+                {
+                    RuntimeIdentifiers = string.Join(";", source.Runtimes.Keys.ToArray())
+                });
+            }
+            
 
             destination.ItemGroups.Add(parseTools(source.Tools));
 
@@ -79,13 +88,23 @@ namespace JsonCsProj.Poc
                     
                 }
                 buildGroup.WarningsAsErrors = source.BuildOptions.WarningsAsErrors?.ToString().ToLower();
-                buildGroup.NoWarn = string.Join(";", source.BuildOptions.Nowarn);
+                if (source.BuildOptions?.Nowarn != null)
+                {
+                    buildGroup.NoWarn = string.Join(";", source.BuildOptions?.Nowarn);
+                }
+                
                 buildGroup.GenerateDocumentationFile = source.BuildOptions.XmlDoc?.ToString().ToLower();
                 buildGroup.PreserveCompliationContext = source.BuildOptions.PreserveCompilationContext?.ToString().ToLower();
                 buildGroup.AssemblyName = source.BuildOptions.OutputName;
-                buildGroup.OutputType = source.BuildOptions.DebugType;
+                //buildGroup.OutputType = source.BuildOptions.DebugType;
                 buildGroup.AllowUnsafeBlocks = source.BuildOptions.AllowUnsafe?.ToString().ToLower();
-                buildGroup.DefineConstants = string.Join(";", source.BuildOptions.Define);
+
+                if (source.BuildOptions?.Define != null)
+                {
+                    buildGroup.DefineConstants = string.Join(";", source.BuildOptions.Define);
+
+                }
+
 
                 destination.PropertyGroups.Add(buildGroup);
             }
@@ -171,30 +190,39 @@ namespace JsonCsProj.Poc
 
             //
 
-           //testRunner: todo
+            //testRunner: todo
 
 
 
 
 
 
-
-
-
+            var settings = new XmlWriterSettings();
+            settings.OmitXmlDeclaration = true;
+            settings.Indent = true;
 
             var serializer = new XmlSerializer(destination.GetType());
             var xns = new XmlSerializerNamespaces();
             xns.Add(string.Empty, string.Empty);
             var xmlName = $@"{Environment.CurrentDirectory}\..\..\{source.Name}.csproj";
             File.Delete(xmlName);
-            using (var fs = new FileStream(xmlName, FileMode.CreateNew))
+
+            using (var stream = new StringWriter())
+            using (var writer = XmlWriter.Create(stream, settings))
             {
-                serializer.Serialize(fs, destination,xns);
+                serializer.Serialize(writer, destination, xns);
+                File.WriteAllText(xmlName, stream.ToString());
             }
+
+           
         }
 
         private static ItemGroup parseDependencies(Dictionary<string, object> dependencies)
         {
+            if (dependencies == null)
+            {
+                return null;
+            }
             var depGroup = new ItemGroup();
             foreach (var dep in dependencies)
             {
@@ -233,6 +261,10 @@ namespace JsonCsProj.Poc
 
         private static ItemGroup parseTools(Dictionary<string, string> tools)
         {
+            if (tools == null)
+            {
+                return null;
+            }
             var toolGroup = new ItemGroup();
             foreach (var tool in tools)
             {
